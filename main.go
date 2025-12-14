@@ -15,6 +15,12 @@ type options struct {
 	BotToken string `long:"token" env:"BOT_TOKEN" required:"true" description:"telegram bot token"`
 }
 
+type readBusinessConnectionMessagePayload struct {
+	BusinessConnectionID string `json:"business_connection_id"`
+	MessageID            int    `json:"message_id"`
+	ChatID               int64  `json:"chat_id"`
+}
+
 func main() {
 	var opts options
 	p := flags.NewParser(&opts, flags.PrintErrors|flags.PassDoubleDash|flags.HelpFlag)
@@ -41,12 +47,21 @@ func run(opts options) error {
 		return fmt.Errorf("tele.NewBot: %w", err)
 	}
 
-	bot.Handle("/start", handle)
+	bot.Handle(tele.OnBusinessMessage, handle)
 
 	bot.Start()
 	return nil
 }
 
 func handle(c tele.Context) error {
-	return c.Send("Hello!")
+	msg := c.Update().BusinessMessage
+	_, err := c.Bot().Raw("readBusinessMessage", readBusinessConnectionMessagePayload{
+		BusinessConnectionID: msg.BusinessConnectionID,
+		MessageID:            msg.ID,
+		ChatID:               msg.Sender.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("readBusinessMessage: %w", err)
+	}
+	return nil
 }
