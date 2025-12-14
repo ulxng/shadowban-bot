@@ -47,6 +47,7 @@ func run(opts options) error {
 		return fmt.Errorf("tele.NewBot: %w", err)
 	}
 
+	bot.Handle("/start", ping)
 	bot.Handle(tele.OnBusinessMessage, handle)
 
 	bot.Start()
@@ -64,4 +65,18 @@ func handle(c tele.Context) error {
 		return fmt.Errorf("readBusinessMessage: %w", err)
 	}
 	return nil
+}
+
+func ping(c tele.Context) error {
+	name, err := c.Bot().MyName("")
+	if err != nil {
+		return fmt.Errorf("bot.MyName: %w", err)
+	}
+	return c.Send(fmt.Sprintf("How to use the bot:\n"+
+		"1. Go to telegram settings -> Telegram Business -> ChatBots\n"+
+		"2. Add the bot %s\n"+
+		"3. Configure the list of contacts you want to hide\n"+
+		"Done!",
+		name.Name,
+	))
 }
