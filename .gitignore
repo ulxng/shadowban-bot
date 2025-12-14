@@ -1,0 +1,6 @@
+.env
+.env.prod
+.env.local
+.idea
+.DS_Store
+*.db
