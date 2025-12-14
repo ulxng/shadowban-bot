@@ -40,7 +40,7 @@ func main() {
 func run(opts options) error {
 	pref := tele.Settings{
 		Token:  opts.BotToken,
-		Poller: &tele.LongPoller{Timeout: time.Second},
+		Poller: &tele.LongPoller{Timeout: time.Second * 5},
 	}
 	bot, err := tele.NewBot(pref)
 	if err != nil {

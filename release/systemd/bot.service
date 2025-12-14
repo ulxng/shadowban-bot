@@ -1,0 +1,13 @@
+[Unit]
+Description=Shadow Ban Bot
+After=network.target
+
+[Service]
+ExecStart=/home/vps/shadowbanbot/bot
+WorkingDirectory=/home/vps/shadowbanbot
+Restart=always
+RestartSec=2
+EnvironmentFile=/home/vps/shadowbanbot/.env
+
+[Install]
+WantedBy=default.target
