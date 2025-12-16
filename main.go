@@ -56,10 +56,14 @@ func run(opts options) error {
 
 func handle(c tele.Context) error {
 	msg := c.Update().BusinessMessage
+	if msg.Chat.ID != msg.Sender.ID {
+		// ignore messages sent by owner
+		return nil
+	}
 	_, err := c.Bot().Raw("readBusinessMessage", readBusinessConnectionMessagePayload{
 		BusinessConnectionID: msg.BusinessConnectionID,
 		MessageID:            msg.ID,
-		ChatID:               msg.Sender.ID,
+		ChatID:               msg.Chat.ID,
 	})
 	if err != nil {
 		return fmt.Errorf("readBusinessMessage: %w", err)
@@ -72,10 +76,12 @@ func ping(c tele.Context) error {
 	if err != nil {
 		return fmt.Errorf("bot.MyName: %w", err)
 	}
-	return c.Send(fmt.Sprintf("How to use the bot:\n"+
-		"1. Go to telegram settings -> Telegram Business -> ChatBots\n"+
+	return c.Send(fmt.Sprintf("How to use the bot:\n\n"+
+		"1. Go to Telegram Settings -> Telegram Business -> ChatBots\n"+
 		"2. Add the bot %s\n"+
-		"3. Configure the list of contacts you want to hide\n"+
+		"3. Select the contacts you want to hide\n"+
+		"4. Scroll down to Bot Permissions and enable \"Mark Messages As Read\"\n"+
+		"\n"+
 		"Done!",
 		name.Name,
 	))
